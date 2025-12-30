@@ -36,6 +36,12 @@ if [[ "${VPN_SERVER_IP:-}" == *"YOUR_SERVER_IP"* || "${VPN_SERVER_IP:-}" == "" ]
 	VPN_SERVER_IP=""
 fi
 
+# helper to get public ip robustly (tries multiple services)
+GET_IP_SCRIPT="$REPO_DIR/scripts/get-public-ip.sh"
+if [[ ! -x "$GET_IP_SCRIPT" ]]; then
+	GET_IP_SCRIPT=""
+fi
+
 log() { printf "[wg-dns-watcher] %s\n" "$*"; }
 
 require_root() {
@@ -46,10 +52,14 @@ require_root() {
 }
 
 vpn_is_up() {
-	# Preferred: compare current public IP with VPN server public IP.
+	# Preferred: compare current public IP with VPN server public IP using multiple endpoints.
 	if [[ -n "${VPN_SERVER_IP:-}" ]]; then
 		local current_ip
-		current_ip="$(curl -s --max-time 3 ifconfig.me || true)"
+		if [[ -n "$GET_IP_SCRIPT" ]]; then
+			current_ip="$($GET_IP_SCRIPT 3 2>/dev/null || true)"
+		else
+			current_ip="$(curl -s --max-time 3 ifconfig.me || true)"
+		fi
 		[[ "$current_ip" == "$VPN_SERVER_IP" ]] && return 0 || return 1
 	fi
 
