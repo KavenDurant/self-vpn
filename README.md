@@ -126,6 +126,10 @@ self-vpn/
 │   ├── add-client.sh        # 添加客户端
 │   ├── monitor.sh           # 流量监控
 │   └── security.sh          # 安全加固
++│   ├── macos-dns-up.sh      # macOS: VPN 连接时设置 DNS
++│   ├── macos-dns-down.sh    # macOS: VPN 断开时恢复 DNS
++│   ├── macos-wireguard-dns-watcher.sh  # macOS: 后台监控 VPN 状态并切换 DNS
++│   └── install-macos-wireguard-dns-watcher.sh # macOS: 安装 watcher 为系统守护进程
 └── clients/                 # 客户端配置（生成后）
     └── (不提交到 Git)
 ```
@@ -156,6 +160,57 @@ ssh -i ~/.ssh/id_ed25519 root@YOUR_SERVER_IP "systemctl restart wg-quick@wg0"
 
 ```bash
 ./scripts/security.sh
+```
+
+---
+
+## 🧩 macOS：WireGuard 连接/断开自动切换 DNS
+
+你之前遇到的现象（**关闭 WireGuard 后百度也打不开**）通常是因为 WireGuard 或系统网络服务的 DNS 没有正确恢复导致的。
+
+本项目提供一个 macOS 后台守护进程：
+
+- WireGuard **连接时**：自动把 DNS 切到海外 DNS（默认 `1.1.1.1`、`8.8.8.8`）
+- WireGuard **断开时**：自动恢复到你本地网络（路由器 / 国内 DNS）。默认使用回退 DNS：`192.168.1.1` + `223.5.5.5`
+
+### 安装（需要 sudo）
+
+> 默认按「有线网络 Ethernet」配置。如你用 Wi‑Fi，把 `Ethernet` 改成 `Wi-Fi`。
+
+```bash
+chmod +x scripts/*.sh
+
+# 安装并启动 watcher（守护进程）
+sudo ./scripts/install-macos-wireguard-dns-watcher.sh \
+  Ethernet \
+  macbook \
+  1.1.1.1 8.8.8.8 \
+  fallback \
+  192.168.1.1 223.5.5.5
+```
+
+### 验证
+
+```bash
+# 查看守护进程状态
+sudo launchctl print system/com.selfvpn.wg-dns-watcher | head -40
+
+# 查看日志
+sudo tail -n 50 /var/log/self-vpn/wg-dns-watcher.out.log
+
+# 查看当前 DNS
+networksetup -getdnsservers Ethernet
+```
+
+你也可以用 `./test-vpn.sh` 分别在「断开 / 连接」状态各跑一次，观察 DNS 与连通性是否符合预期。
+
+### 卸载 / 回滚
+
+```bash
+sudo launchctl bootout system /Library/LaunchDaemons/com.selfvpn.wg-dns-watcher.plist 2>/dev/null || true
+sudo rm -f /Library/LaunchDaemons/com.selfvpn.wg-dns-watcher.plist
+sudo rm -rf /usr/local/self-vpn
+sudo rm -rf /var/log/self-vpn
 ```
 
 ---
@@ -217,13 +272,3 @@ ssh -i ~/.ssh/id_ed25519 root@YOUR_SERVER_IP "systemctl restart wg-quick@wg0"
 ## 📄 许可证
 
 本项目采用 MIT License 开源。
-
----
-
-## ⚖️ 免责声明
-
-本项目仅供学习和研究使用。请遵守当地法律法规。作者不对使用本项目产生的任何后果负责。
-
----
-
-**Made with ❤️ for privacy and security**
