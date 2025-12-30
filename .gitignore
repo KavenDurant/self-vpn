@@ -1,0 +1,23 @@
+# 环境变量
+.env
+
+# 客户端配置文件（包含私钥）
+clients/*.conf
+clients/*.png
+clients/*_private.key
+clients/*_public.key
+
+# 服务器配置备份
+config/*.conf
+config/server_public.key
+!config/*.template
+
+# 日志
+*.log
+
+# macOS
+.DS_Store
+
+# 临时文件
+*.tmp
+*.swp

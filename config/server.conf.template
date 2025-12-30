@@ -1,0 +1,18 @@
+[Interface]
+# 服务器私钥（部署时自动生成）
+PrivateKey = SERVER_PRIVATE_KEY
+# 服务器监听地址
+Address = 10.8.0.1/24
+# 监听端口
+ListenPort = 51820
+# 启动时执行的命令
+PostUp = ufw route allow in on wg0 out on eth0
+PostUp = iptables -t nat -I POSTROUTING -o eth0 -j MASQUERADE
+PostUp = ip6tables -t nat -I POSTROUTING -o eth0 -j MASQUERADE
+# 关闭时执行的命令
+PreDown = ufw route delete allow in on wg0 out on eth0
+PreDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+PreDown = ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+# 客户端配置将在这里自动添加
+# [Peer] sections will be added here by add-client.sh

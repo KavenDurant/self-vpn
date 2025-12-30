@@ -1,0 +1,17 @@
+[Interface]
+# 客户端私钥（自动生成）
+PrivateKey = CLIENT_PRIVATE_KEY
+# 客户端 IP 地址
+Address = CLIENT_IP/32
+# DNS 服务器
+DNS = 1.1.1.1, 8.8.8.8
+
+[Peer]
+# 服务器公钥
+PublicKey = SERVER_PUBLIC_KEY
+# 允许的 IP 范围（0.0.0.0/0 表示全局流量）
+AllowedIPs = 0.0.0.0/0, ::/0
+# 服务器地址和端口
+Endpoint = SERVER_IP:SERVER_PORT
+# 保持连接（25 秒发送一次心跳）
+PersistentKeepalive = 25
