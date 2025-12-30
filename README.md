@@ -1,129 +1,229 @@
-# Self-VPN 部署项目
+# 🔐 Self-VPN
 
-🔐 基于 WireGuard 的个人 VPN 解决方案
+基于 WireGuard 的个人 VPN 解决方案，一键部署，支持多设备。
 
-## 📊 服务器配置
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![WireGuard](https://img.shields.io/badge/VPN-WireGuard-blue.svg)](https://www.wireguard.com/)
 
-- **提供商**: DigitalOcean
-- **配置**: $4/月 (512MB RAM / 1 CPU / 10GB SSD / 500GB 流量)
+---
+
+## ✨ 特性
+
+- 🚀 **一键部署** - 自动化脚本，3-5 分钟完成部署
+- 🔒 **安全可靠** - 基于 WireGuard 现代加密技术
+- 📱 **多设备支持** - 支持 4 台设备（iPhone、iPad、MacBook、Windows）
+- 💰 **成本低廉** - 月费仅 $4，预算 $30 可用 7.5 个月
+- 📊 **流量监控** - 内置流量监控和告警功能
+- 🛡️ **安全加固** - 自动化 SSH 和防火墙配置
+
+---
+
+## 📋 系统要求
+
+### 服务器
+- **提供商**: DigitalOcean（或其他 VPS）
+- **配置**: 最低 512MB RAM / 1 CPU / 10GB 硬盘
 - **系统**: Ubuntu 22.04 LTS x64
-- **区域**: 推荐 San Francisco (SFO3) 或 Singapore (SGP1)
-- **预算**: $30 (可用约 7.5 个月)
+- **流量**: 500GB/月起
+- **费用**: $4/月起
 
-## 🎯 功能特性
+### 客户端
+- iOS 12+ / iPadOS 12+
+- macOS 10.14+
+- Windows 10+
+- Android 5.0+
 
-- ✅ 支持 4 台设备同时配置
-- ✅ 一键自动部署 WireGuard
-- ✅ 安全加固（防火墙、SSH 配置）
-- ✅ 流量监控和告警
-- ✅ 健康检查脚本
-- ✅ 客户端配置生成（含二维码）
-
-## 📁 项目结构
-
-```
-self-vpn/
-├── README.md                 # 项目文档
-├── config/
-│   ├── server.conf.template  # 服务端配置模板
-│   └── client.conf.template  # 客户端配置模板
-├── scripts/
-│   ├── deploy.sh            # 一键部署脚本
-│   ├── add-client.sh        # 添加客户端
-│   ├── monitor.sh           # 流量监控
-│   └── security.sh          # 安全加固
-├── clients/                 # 客户端配置文件（生成后）
-└── .env.example            # 环境变量示例
-```
+---
 
 ## 🚀 快速开始
 
-### 1. 创建服务器后，获取 IP 地址
+### 1. 克隆项目
 
 ```bash
-# 测试连接
-ssh -i ~/.ssh/id_ed25519 root@YOUR_SERVER_IP
+git clone https://github.com/KavenDurant/self-vpn.git
+cd self-vpn
 ```
 
-### 2. 配置环境变量
+### 2. 配置环境
 
 ```bash
+# 复制环境变量模板
 cp .env.example .env
-# 编辑 .env，填入服务器 IP
+
+# 编辑 .env，填入你的服务器 IP
+vim .env
 ```
 
 ### 3. 一键部署
 
 ```bash
-./scripts/deploy.sh
+# 确保脚本有执行权限
+chmod +x scripts/*.sh
+
+# 执行快速部署
+./scripts/deploy-quick.sh
 ```
 
-### 4. 生成客户端配置
+### 4. 添加客户端
 
 ```bash
+# 为每台设备生成配置
 ./scripts/add-client.sh iphone
 ./scripts/add-client.sh macbook
 ./scripts/add-client.sh ipad
 ./scripts/add-client.sh windows
 ```
 
-## 📱 客户端使用
+---
 
-### iOS/macOS
-1. 安装 WireGuard 官方 App
+## 📱 客户端配置
+
+### iOS/iPadOS
+
+1. App Store 下载 **WireGuard**
 2. 扫描生成的二维码或导入配置文件
+3. 点击开关连接
+
+详细说明：[SUCCESS.md](SUCCESS.md)
+
+### macOS
+
+1. App Store 下载 **WireGuard**
+2. 从文件导入隧道（选择 `clients/macbook.conf`）
+3. 点击激活连接
+
+详细说明：[MACBOOK_GUIDE.md](MACBOOK_GUIDE.md)
 
 ### Windows
-1. 下载 WireGuard: https://www.wireguard.com/install/
+
+1. 下载 [WireGuard](https://www.wireguard.com/install/)
 2. 导入配置文件
+3. 点击激活连接
 
 ### Android
-1. 安装 WireGuard App
-2. 扫描二维码
 
-## 📊 监控和维护
+1. Google Play 下载 **WireGuard**
+2. 扫描二维码或导入配置文件
+3. 点击开关连接
 
-### 查看流量使用
+---
+
+## 📁 项目结构
+
+```
+self-vpn/
+├── README.md                 # 项目说明
+├── DEPLOYMENT_GUIDE.md       # 完整部署指南
+├── SUCCESS.md                # 部署成功后的使用指南
+├── MACBOOK_GUIDE.md          # macOS 客户端指南
+├── .env.example              # 环境变量模板
+├── config/
+│   ├── server.conf.template  # 服务端配置模板
+│   └── client.conf.template  # 客户端配置模板
+├── scripts/
+│   ├── deploy.sh            # 完整部署脚本
+│   ├── deploy-quick.sh      # 快速部署脚本
+│   ├── add-client.sh        # 添加客户端
+│   ├── monitor.sh           # 流量监控
+│   └── security.sh          # 安全加固
+└── clients/                 # 客户端配置（生成后）
+    └── (不提交到 Git)
+```
+
+---
+
+## 🔧 维护命令
+
+### 查看服务器状态
+
+```bash
+ssh -i ~/.ssh/id_ed25519 root@YOUR_SERVER_IP "wg show"
+```
+
+### 流量监控
+
 ```bash
 ./scripts/monitor.sh
 ```
 
-### 查看连接状态
+### 重启 VPN 服务
+
 ```bash
-ssh root@YOUR_SERVER_IP "wg show"
+ssh -i ~/.ssh/id_ed25519 root@YOUR_SERVER_IP "systemctl restart wg-quick@wg0"
 ```
 
-## 🔒 安全建议
+### 安全加固
 
-- ✅ 使用 SSH 密钥认证（已配置）
-- ✅ 禁用 SSH 密码登录（自动配置）
-- ✅ 配置防火墙仅开放必要端口（自动配置）
-- ✅ 定期更新系统（每月执行）
-- ⚠️ 不要分享配置文件
-- ⚠️ 定期检查流量使用（避免超限）
+```bash
+./scripts/security.sh
+```
 
-## 💰 成本控制
+---
 
-- **每月流量**: 500GB
-- **预估使用**: 每天 2-3 小时，月流量约 100-200GB
-- **告警阈值**: 400GB（80%）
+## ⚠️ 安全提示
 
-## 🆘 故障排查
+1. **不要提交敏感文件到 Git**
+   - `.env` 包含服务器信息
+   - `clients/*.conf` 包含私钥
+   - 所有密钥文件
 
-### 无法连接
-1. 检查服务器防火墙：`ufw status`
-2. 检查 WireGuard 状态：`systemctl status wg-quick@wg0`
-3. 检查端口：`ss -tulpn | grep 51820`
+2. **定期备份配置**
+   ```bash
+   tar -czf vpn-backup-$(date +%Y%m%d).tar.gz clients/
+   ```
 
-### 速度慢
-1. 更换服务器区域
-2. 检查本地网络
-3. 尝试更换端口
+3. **流量监控**
+   - 每月限制：500GB
+   - 建议用量：不超过 400GB
+   - 每周检查一次
 
-## 📞 联系方式
+---
 
-- Email: luojiaxin888@gmail.com
+## 💰 成本计算
 
-## 📄 License
+### DigitalOcean 方案
 
-MIT License
+| 配置 | 价格 | 流量 | 可用时长（$30） |
+|------|------|------|----------------|
+| 512MB / 1CPU | $4/月 | 500GB | 7.5 个月 |
+| 1GB / 1CPU | $6/月 | 1TB | 5 个月 |
+| 2GB / 1CPU | $12/月 | 2TB | 2.5 个月 |
+
+### 流量消耗参考
+
+| 活动 | 每小时流量 |
+|------|-----------|
+| 网页浏览 | ~100MB |
+| 1080p 视频 | ~3GB |
+| 4K 视频 | ~7GB |
+| 音乐流媒体 | ~50MB |
+
+---
+
+## 📚 文档
+
+- [完整部署指南](DEPLOYMENT_GUIDE.md)
+- [成功部署指南](SUCCESS.md)
+- [macOS 客户端指南](MACBOOK_GUIDE.md)
+
+---
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+---
+
+## 📄 许可证
+
+本项目采用 MIT License 开源。
+
+---
+
+## ⚖️ 免责声明
+
+本项目仅供学习和研究使用。请遵守当地法律法规。作者不对使用本项目产生的任何后果负责。
+
+---
+
+**Made with ❤️ for privacy and security**
